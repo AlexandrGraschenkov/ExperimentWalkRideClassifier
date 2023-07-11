@@ -1,2 +1,5 @@
 # OS X
 .DS_Store
+
+__pycache__
+.vscode

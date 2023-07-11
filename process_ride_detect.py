@@ -24,10 +24,21 @@ class WalkDetect:
         
         max_speed_kmh = max(speed) * 3.6
         return max_speed_kmh > 15
+    
+    def _check_is_walk_by_motion_data(self, motion_file):
+        import pandas as pd
+        import numpy as np
+        data = pd.read_csv(motion_file)
+        std_val = np.std(data["rrate_z"])
+        # обычно у пользователя в руках тряска поворачивает сильно телефон по оси Z
+        return std_val > 0.12 
 
     def check_is_walk(self, motion_file, gps_file = None):
         if gps_file and self._check_is_ride_by_gps_speed(gps_file):
             return False # 100% ride
+        
+        if self._check_is_walk_by_motion_data(motion_file):
+            return True
         
         values = WalkDetect.prepare_data(motion_file)
         res = self.model.predict([values])[0]
